@@ -1,4 +1,6 @@
 FROM bash:4.4.19
 
+LABEL maintainer="chaim.tevel@bitbean.com"
+
 RUN apk update && apk upgrade \
-  && apk add  --no-cache php7 python
+  && apk add --no-cache php7 python
