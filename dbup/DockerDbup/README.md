@@ -2,6 +2,13 @@ This image runs sql scripts using [Dbup](https://dbup.github.io/). For now we on
 
 ### Command Line Args
 
+Here are the currently supported commands:
+
+1. migrate
+1. info
+
+These options are globally available for these commands:
+
 __Connection String__
 
 ```sh
