@@ -1,9 +1,7 @@
-FROM mcr.microsoft.com/powershell:nanoserver-1903
+FROM mcr.microsoft.com/powershell:nanoserver-1809
 
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
-
-# USER ContainerAdministrator
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 COPY ./Robocopy.exe C:/Windows/System32/Robocopy.exe
 
-RUN iwr -useb get.scoop.sh | iex
+RUN "iwr -useb get.scoop.sh | iex"
