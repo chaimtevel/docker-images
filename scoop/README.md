@@ -1,0 +1,1 @@
+Was trying to avoid using https://hub.docker.com/r/stefanscherer/scoop because the base image is using windows server core which is very large. So far the image we built works on nanoserver but only for a few scoop packages :-(

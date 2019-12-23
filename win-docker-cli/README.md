@@ -1,0 +1,1 @@
+We can just use this image https://hub.docker.com/r/stefanscherer/docker-cli-windows. It uses a nanoserver base image which is fine. See the [dockerfile](https://github.com/StefanScherer/dockerfiles-windows/blob/master/docker-cli/Dockerfile).
