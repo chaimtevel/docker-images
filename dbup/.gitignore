@@ -20,6 +20,8 @@ Obj/
 *.user
 
 appsettings.*.json
+launchSettings.json
+
 
 # nuget
 *.nupkg

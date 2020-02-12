@@ -1,7 +1,9 @@
 ﻿using DbUp;
+using DbUp.Builder;
 using DbUp.Helpers;
 using DockerDbup.Options;
 using System;
+using System.Collections.Generic;
 
 namespace DockerDbup.Runners
 {
@@ -26,8 +28,16 @@ namespace DockerDbup.Runners
 
             Console.WriteLine($"Starting Migrations on scripts at {path}");
 
-            var journaledRunnerBuilder = DeployChanges.To
-                .SqlDatabase(connectionString)
+            var dbEngineMapping = new Dictionary<DbEngines, Func<SupportedDatabases, UpgradeEngineBuilder>>
+            {
+                { DbEngines.SqlServer, sd => sd.SqlDatabase(connectionString) },
+                { DbEngines.PostgreSql, sd => sd.PostgresqlDatabase(connectionString) },
+                { DbEngines.MySql, sd => sd.MySqlDatabase(connectionString) }
+            };
+
+            UpgradeEngineBuilder GetDbBuilder() => dbEngineMapping[Options.DbEngine]?.Invoke(DeployChanges.To);
+
+            var journaledRunnerBuilder = GetDbBuilder()
                 .WithTransaction()
                 .WithScriptsFromFileSystem(path, s => !s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
                 .LogToConsole()
@@ -42,8 +52,7 @@ namespace DockerDbup.Runners
                 throw journaledRunnerResult.Error;
             }
 
-            var idempotentRunnerBuilder = DeployChanges.To
-                .SqlDatabase(connectionString)
+            var idempotentRunnerBuilder = GetDbBuilder()
                 .WithScriptsFromFileSystem(path, s => s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
                 .JournalTo(new NullJournal())
                 .LogToConsole()

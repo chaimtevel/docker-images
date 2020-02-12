@@ -11,8 +11,16 @@ namespace DockerDbup
         {
             try
             {
+                Parser parser = new Parser(c =>
+                {
+                    c.CaseInsensitiveEnumValues = true;
+                    c.CaseSensitive = false;
+                    c.EnableDashDash = Parser.Default.Settings.EnableDashDash;
+                    c.HelpWriter = Parser.Default.Settings.HelpWriter;
+                });
+                
                 // I'm unsure if its a bug but verbs aren't validated unless there are two of them
-                var result = CommandLine.Parser.Default.ParseArguments<MigrateOptions, InfoOptions>(args)
+                var result = parser.ParseArguments<MigrateOptions, InfoOptions>(args)
                         .WithParsed<MigrateOptions>(o => new MigrationRunner(o).Run())
                         .WithParsed<InfoOptions>(o => new InfoRunner(o).Run());
 

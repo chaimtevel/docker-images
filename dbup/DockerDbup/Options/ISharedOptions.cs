@@ -9,5 +9,8 @@ namespace DockerDbup.Options
 
         [Option('p', "scripts-path", HelpText = "override the default location for migrations of /dbup/sql")]
         string ScriptsPath { get; set; }
+
+        [Option('e', "db-engine", HelpText = "Specify the db engine to use. The default value is SqlServer")]
+        DbEngines DbEngine { get; set; }
     }
 }
