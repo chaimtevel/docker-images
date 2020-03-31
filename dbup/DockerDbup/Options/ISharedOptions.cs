@@ -11,6 +11,6 @@ namespace DockerDbup.Options
         string ScriptsPath { get; set; }
 
         [Option('e', "db-engine", HelpText = "Specify the db engine to use. The default value is SqlServer")]
-        DbEngines DbEngine { get; set; }
+        DbEngines? DbEngine { get; set; }
     }
 }

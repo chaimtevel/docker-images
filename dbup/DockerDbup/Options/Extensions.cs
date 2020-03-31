@@ -10,5 +10,16 @@ namespace DockerDbup.Options
         public static string GetScriptsPath(this ISharedOptions options)
             => options?.ScriptsPath ?? Environment.GetEnvironmentVariable("SCRIPTS_PATH") ?? "/dbup/sql";
 
+        public static DbEngines GetDbEngine(this ISharedOptions options)
+        {
+            if(!(options?.DbEngine).HasValue)
+            {
+                string env = Environment.GetEnvironmentVariable("DB_ENGINE");
+                Enum.TryParse(env, true, out DbEngines dbEngine);
+                return dbEngine;
+            }
+
+            return options.DbEngine.Value;
+        }
     }
 }

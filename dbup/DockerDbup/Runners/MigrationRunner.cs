@@ -20,24 +20,16 @@ namespace DockerDbup.Runners
         {
             string connectionString = Options.GetConnectionString();
             string path = Options.GetScriptsPath();
+            var dbEngine = Options.GetDbEngine();
 
-            if(connectionString == null)
+            if (connectionString == null)
             {
                 throw new ArgumentNullException(nameof(connectionString), Messages.RequireConnectionString);
             }
 
-            Console.WriteLine($"Starting Migrations on scripts at {path}");
+            Console.WriteLine($"Starting Migrations on scripts at {path} for db engine {dbEngine}");
 
-            var dbEngineMapping = new Dictionary<DbEngines, Func<SupportedDatabases, UpgradeEngineBuilder>>
-            {
-                { DbEngines.SqlServer, sd => sd.SqlDatabase(connectionString) },
-                { DbEngines.PostgreSql, sd => sd.PostgresqlDatabase(connectionString) },
-                { DbEngines.MySql, sd => sd.MySqlDatabase(connectionString) }
-            };
-
-            UpgradeEngineBuilder GetDbBuilder() => dbEngineMapping[Options.DbEngine]?.Invoke(DeployChanges.To);
-
-            var journaledRunnerBuilder = GetDbBuilder()
+            var journaledRunnerBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
                 .WithTransaction()
                 .WithScriptsFromFileSystem(path, s => !s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
                 .LogToConsole()
@@ -52,7 +44,7 @@ namespace DockerDbup.Runners
                 throw journaledRunnerResult.Error;
             }
 
-            var idempotentRunnerBuilder = GetDbBuilder()
+            var idempotentRunnerBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
                 .WithScriptsFromFileSystem(path, s => s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
                 .JournalTo(new NullJournal())
                 .LogToConsole()

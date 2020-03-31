@@ -7,6 +7,6 @@ namespace DockerDbup.Options
     {
         public string ScriptsPath { get; set; }
         public string ConnectionString { get; set; }
-        public DbEngines DbEngine { get; set; }
+        public DbEngines? DbEngine { get; set; }
     }
 }

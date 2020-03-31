@@ -20,14 +20,14 @@ namespace DockerDbup.Runners
         {
             string connectionString = Options.GetConnectionString();
             string path = Options.GetScriptsPath();
+            var dbEngine = Options.GetDbEngine();
 
             if (connectionString == null)
             {
                 throw new ArgumentNullException(nameof(connectionString), Messages.RequireConnectionString);
             }
 
-            var showExcutedScriptsBuilder = DeployChanges.To
-                .SqlDatabase(connectionString)
+            var showExcutedScriptsBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
                 .WithScriptsFromFileSystem(path)
                 .LogToConsole()
                 .LogScriptOutput()
