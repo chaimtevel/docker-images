@@ -21,6 +21,7 @@ namespace DockerDbup.Runners
             string connectionString = Options.GetConnectionString();
             string path = Options.GetScriptsPath();
             var dbEngine = Options.GetDbEngine();
+            var disableVars = Options.GetDisableVariables();
 
             if (connectionString == null)
             {
@@ -29,14 +30,21 @@ namespace DockerDbup.Runners
 
             Console.WriteLine($"Starting Migrations on scripts at {path} for db engine {dbEngine}");
 
+            // with journal
             var journaledRunnerBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
                 .WithTransaction()
                 .WithScriptsFromFileSystem(path, s => !s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
                 .LogToConsole()
-                .LogScriptOutput()
-                .Build();
+                .LogScriptOutput();
 
-            var journaledRunnerResult = journaledRunnerBuilder.PerformUpgrade();
+            if(disableVars)
+            {
+                journaledRunnerBuilder = journaledRunnerBuilder.WithVariablesDisabled();
+            }
+
+            var journaledRunner = journaledRunnerBuilder.Build();
+
+            var journaledRunnerResult = journaledRunner.PerformUpgrade();
             PrintResult(journaledRunnerResult, "Successfully executed scripts:");
 
             if (!journaledRunnerResult.Successful)
@@ -44,21 +52,28 @@ namespace DockerDbup.Runners
                 throw journaledRunnerResult.Error;
             }
 
+
+            // idenmpotent
             var idempotentRunnerBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
                 .WithScriptsFromFileSystem(path, s => s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
                 .JournalTo(new NullJournal())
                 .LogToConsole()
-                .LogScriptOutput()
-                .Build();
+                .LogScriptOutput();
 
-            var idempotentRunnerResult = idempotentRunnerBuilder.PerformUpgrade();
+            if (disableVars)
+            {
+                idempotentRunnerBuilder = idempotentRunnerBuilder.WithVariablesDisabled();
+            }
+
+            var idempotentRunner = idempotentRunnerBuilder.Build();
+
+            var idempotentRunnerResult = idempotentRunner.PerformUpgrade();
             PrintResult(idempotentRunnerResult, "Successfully executed idempotent scripts:");
 
             if (!idempotentRunnerResult.Successful)
             {
                 throw idempotentRunnerResult.Error;
             }
-
         }
 
         private void PrintResult(DbUp.Engine.DatabaseUpgradeResult result, string msg)

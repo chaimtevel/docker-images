@@ -21,5 +21,24 @@ namespace DockerDbup.Options
 
             return options.DbEngine.Value;
         }
+
+        public static bool GetDisableVariables(this MigrateOptions options)
+        {
+            if(!options.DisableVariables.HasValue)
+            {
+                string disableVars = Environment.GetEnvironmentVariable("DISABLE_VARS");
+                if(bool.TryParse(disableVars, out bool result))
+                {
+                    return result;
+                }
+            }
+            else
+            {
+                return options.DisableVariables.Value;
+            }
+
+            return false;
+        }
+
     }
 }
