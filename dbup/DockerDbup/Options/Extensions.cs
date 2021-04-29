@@ -40,5 +40,23 @@ namespace DockerDbup.Options
             return false;
         }
 
+        public static bool GetDisableDbTransaction(this MigrateOptions options)
+        {
+            if (!options.DisableTransaction.HasValue)
+            {
+                string disableTransaction = Environment.GetEnvironmentVariable("DISABLE_DB_TRANSACTION");
+                if (bool.TryParse(disableTransaction, out bool result))
+                {
+                    return result;
+                }
+            }
+            else
+            {
+                return options.DisableVariables.Value;
+            }
+
+            return false;
+        }
+
     }
 }

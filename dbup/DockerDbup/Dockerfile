@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-alpine as build
+FROM mcr.microsoft.com/dotnet/sdk:5.0-alpine AS build
 
 WORKDIR /src
 
@@ -6,7 +6,7 @@ COPY . .
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/core/runtime:3.1-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine
 WORKDIR /app
 COPY --from=build /app .
 ENTRYPOINT ["dotnet", "DockerDbup.dll"]

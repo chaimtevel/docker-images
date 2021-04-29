@@ -22,6 +22,7 @@ namespace DockerDbup.Runners
             string path = Options.GetScriptsPath();
             var dbEngine = Options.GetDbEngine();
             var disableVars = Options.GetDisableVariables();
+            var disableTransaction = Options.GetDisableDbTransaction();
 
             if (connectionString == null)
             {
@@ -32,7 +33,6 @@ namespace DockerDbup.Runners
 
             // with journal
             var journaledRunnerBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
-                .WithTransaction()
                 .WithScriptsFromFileSystem(path, s => !s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
                 .LogToConsole()
                 .LogScriptOutput();
@@ -40,6 +40,11 @@ namespace DockerDbup.Runners
             if(disableVars)
             {
                 journaledRunnerBuilder = journaledRunnerBuilder.WithVariablesDisabled();
+            }
+
+            if(!disableTransaction)
+            {
+                journaledRunnerBuilder = journaledRunnerBuilder.WithTransaction();
             }
 
             var journaledRunner = journaledRunnerBuilder.Build();
@@ -52,8 +57,11 @@ namespace DockerDbup.Runners
                 throw journaledRunnerResult.Error;
             }
 
+            // idempotent
+            Console.WriteLine();
 
-            // idenmpotent
+            Console.WriteLine($"Starting idempotent Migrations on scripts at {path} for db engine {dbEngine}");
+
             var idempotentRunnerBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
                 .WithScriptsFromFileSystem(path, s => s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
                 .JournalTo(new NullJournal())
@@ -63,6 +71,11 @@ namespace DockerDbup.Runners
             if (disableVars)
             {
                 idempotentRunnerBuilder = idempotentRunnerBuilder.WithVariablesDisabled();
+            }
+
+            if (!disableTransaction)
+            {
+                idempotentRunnerBuilder = idempotentRunnerBuilder.WithTransaction();
             }
 
             var idempotentRunner = idempotentRunnerBuilder.Build();
@@ -76,7 +89,7 @@ namespace DockerDbup.Runners
             }
         }
 
-        private void PrintResult(DbUp.Engine.DatabaseUpgradeResult result, string msg)
+        private static void PrintResult(DbUp.Engine.DatabaseUpgradeResult result, string msg)
         {
             if (result.Successful)
             {
