@@ -52,7 +52,7 @@ namespace DockerDbup.Options
             }
             else
             {
-                return options.DisableVariables.Value;
+                return options.DisableTransaction.Value;
             }
 
             return false;
