@@ -32,3 +32,17 @@ Alternatively, you can just set an environment variable named `SCRIPTS_PATH`.
 ### Idempotent
 
 Any file that has that term in its name will be considered idempotent and be run every time.
+
+### Build
+
+#### Single file build
+
+```sh
+dotnet publish -r win-x64 -c release -o .\bin -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true
+```
+
+#### Docker build
+
+```sh
+ docker build -t git.bitbean.com:4567/internal/docker-images/dbup:1.0.5  .
+```
