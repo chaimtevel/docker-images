@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DockerDbup.Options
+﻿namespace DockerDbup.Options
 {
     public static class Extensions
     {
@@ -53,6 +51,24 @@ namespace DockerDbup.Options
             else
             {
                 return options.DisableTransaction.Value;
+            }
+
+            return false;
+        }
+
+        public static bool GetSearchRecursively(this MigrateOptions options)
+        {
+            if (!options.SearchScriptsRecursively.HasValue)
+            {
+                string searchScriptsRecursively = Environment.GetEnvironmentVariable("SEARCH_SCRIPTS_RECURSIVELY");
+                if (bool.TryParse(searchScriptsRecursively, out bool result))
+                {
+                    return result;
+                }
+            }
+            else
+            {
+                return options.SearchScriptsRecursively.Value;
             }
 
             return false;

@@ -1,9 +1,6 @@
 ﻿using DbUp;
-using DbUp.Builder;
 using DbUp.Helpers;
 using DockerDbup.Options;
-using System;
-using System.Collections.Generic;
 
 namespace DockerDbup.Runners
 {
@@ -23,6 +20,7 @@ namespace DockerDbup.Runners
             var dbEngine = Options.GetDbEngine();
             var disableVars = Options.GetDisableVariables();
             var disableTransaction = Options.GetDisableDbTransaction();
+            var searchScriptRecursively = Options.GetSearchRecursively();
 
             if (connectionString == null)
             {
@@ -31,9 +29,15 @@ namespace DockerDbup.Runners
 
             Console.WriteLine($"Starting Migrations on scripts at {path} for db engine {dbEngine}");
 
+            var journaledRunnerScriptOptions = new DbUp.ScriptProviders.FileSystemScriptOptions
+            {
+                Filter = s => !s.Contains("idempotent", StringComparison.OrdinalIgnoreCase),
+                IncludeSubDirectories = searchScriptRecursively
+            };
+
             // with journal
             var journaledRunnerBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
-                .WithScriptsFromFileSystem(path, s => !s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
+                .WithScriptsFromFileSystem(path, journaledRunnerScriptOptions)
                 .LogToConsole()
                 .LogScriptOutput();
 
@@ -62,8 +66,14 @@ namespace DockerDbup.Runners
 
             Console.WriteLine($"Starting idempotent Migrations on scripts at {path} for db engine {dbEngine}");
 
+            var idempotentRunnerScriptOptions = new DbUp.ScriptProviders.FileSystemScriptOptions
+            {
+                Filter = s => s.Contains("idempotent", StringComparison.OrdinalIgnoreCase),
+                IncludeSubDirectories = searchScriptRecursively
+            };
+
             var idempotentRunnerBuilder = Mappings.GetDbBuilder(dbEngine, DeployChanges.To, connectionString)
-                .WithScriptsFromFileSystem(path, s => s.Contains("idempotent", StringComparison.OrdinalIgnoreCase))
+                .WithScriptsFromFileSystem(path, idempotentRunnerScriptOptions)
                 .JournalTo(new NullJournal())
                 .LogToConsole()
                 .LogScriptOutput();
