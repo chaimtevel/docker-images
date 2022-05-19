@@ -6,7 +6,7 @@ COPY . .
 RUN dotnet restore
 RUN dotnet publish -c Release -o /app
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine
+FROM mcr.microsoft.com/dotnet/runtime:6.0-alpine
 WORKDIR /app
 COPY --from=build /app .
 ENTRYPOINT ["dotnet", "DockerDbup.dll"]
