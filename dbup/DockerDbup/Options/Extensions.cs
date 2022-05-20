@@ -53,7 +53,7 @@
                 return options.DisableTransaction.Value;
             }
 
-            return false;
+            return true;
         }
 
         public static bool GetSearchRecursively(this MigrateOptions options)
