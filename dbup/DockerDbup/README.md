@@ -39,6 +39,11 @@ Any file that has that term in its name will be considered idempotent and be run
 
 ```sh
 dotnet publish -r win-x64 -c release -o .\bin -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true
+
+# or
+
+ dotnet publish -r linux-musl-x64  -c release --sc true  -o .\bin\linux -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true
+
 ```
 
 #### Docker build
