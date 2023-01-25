@@ -21,6 +21,7 @@ namespace DockerDbup.Runners
             var disableVars = Options.GetDisableVariables();
             var disableTransaction = Options.GetDisableDbTransaction();
             var searchScriptRecursively = Options.GetSearchRecursively();
+            var timeout = Options.GetTimeout();
 
             if (connectionString == null)
             {
@@ -41,7 +42,7 @@ namespace DockerDbup.Runners
                 .LogToConsole()
                 .LogScriptOutput();
 
-            if(disableVars)
+            if (disableVars)
             {
                 journaledRunnerBuilder = journaledRunnerBuilder.WithVariablesDisabled();
             }
@@ -49,6 +50,11 @@ namespace DockerDbup.Runners
             if(!disableTransaction)
             {
                 journaledRunnerBuilder = journaledRunnerBuilder.WithTransaction();
+            }
+
+            if(timeout.HasValue)
+            {
+                journaledRunnerBuilder = journaledRunnerBuilder.WithExecutionTimeout(timeout.Value);
             }
 
             var journaledRunner = journaledRunnerBuilder.Build();

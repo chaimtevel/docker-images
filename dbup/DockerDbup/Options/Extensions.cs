@@ -74,5 +74,27 @@
             return false;
         }
 
+        public static TimeSpan? GetTimeout(this MigrateOptions options)
+        {
+            string timeoutSeconds = Environment.GetEnvironmentVariable("TIMEOUT_SECONDS");
+            int? seconds = default;
+
+            if (options.TimeoutSeconds.HasValue)
+            {
+                seconds = options.TimeoutSeconds.Value;
+            }
+            else if(int.TryParse(timeoutSeconds, out var parsedTimeoutSeconds))
+            {
+                seconds = parsedTimeoutSeconds;
+            }
+
+            if(seconds.HasValue && seconds <= 0)
+            {
+                throw new ArgumentException("Time out seconds must be greater than zero");
+            }
+
+            return seconds.HasValue ? TimeSpan.FromSeconds(seconds.Value) : default(TimeSpan?);
+        }
+
     }
 }
