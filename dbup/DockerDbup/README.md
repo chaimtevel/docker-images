@@ -49,5 +49,5 @@ dotnet publish -r win-x64 -c release --sc true -o .\bin\win -p:PublishSingleFile
 #### Docker build
 
 ```sh
- docker build -t git.bitbean.com:4567/internal/docker-images/dbup:1.0.5  .
+ docker build -t git.bitbean.com:4567/internal/docker-images/dbup:1.0.9 .
 ```
