@@ -42,7 +42,7 @@ dotnet publish -r win-x64 -c release --sc true -o .\bin\win -p:PublishSingleFile
 
 # or
 
- dotnet publish -r linux-musl-x64  -c release --sc true -o .\bin\linux -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true
+ dotnet publish -r linux-x64  -c release --sc true -o .\bin\linux -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:PublishTrimmed=true
 
 ```
 
